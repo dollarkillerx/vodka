@@ -1,6 +1,6 @@
 /**
  * @Author: DollarKiller
- * @Description: 服务 结构
+ * @Description: 服务存储源信息
  * @Github: https://github.com/dollarkillerx
  * @Date: Create in 22:39 2019-09-23
  */
