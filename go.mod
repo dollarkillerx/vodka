@@ -1,4 +1,4 @@
-module dkg
+module github.com/dollarkillerx/vodka
 
 go 1.12
 

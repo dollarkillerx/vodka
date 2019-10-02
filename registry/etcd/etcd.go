@@ -8,22 +8,36 @@ package etcd
 
 import (
 	"context"
-	"dkg/registry"
 	"fmt"
+	"github.com/dollarkillerx/vodka/registry"
 	"go.etcd.io/etcd/clientv3"
+	"sync"
+)
+
+const (
+	MaxServiceNum = 8
 )
 
 type EtcdRegistry struct {
 	options   *registry.Options
 	client    *clientv3.Client
 	serviceCh chan *registry.Service
+
+	registryServiceMap sync.Map
 }
 
 var (
 	etcdRegistry = &EtcdRegistry{
-		serviceCh: make(chan *registry.Service, 8),
+		serviceCh: make(chan *registry.Service, MaxServiceNum),
 	}
 )
+
+type RegisterService struct {
+	id            clientv3.LeaseID  // 租约id
+	service       *registry.Service // 服务体
+	registered    bool              // 是否注册
+	keepAliveChan <-chan *clientv3.LeaseKeepAliveResponse
+}
 
 func init() {
 	registry.RegisterPlugin(etcdRegistry)
@@ -80,5 +94,17 @@ func (e *EtcdRegistry) GetService(ctx context.Context, name string) (service *re
 }
 
 func (e *EtcdRegistry) run() {
-
+	for {
+		select {
+		case item := <- e.serviceCh:
+			// 先查询是否存在  如果存在则续租，反之进行注册
+			_, ok := e.registryServiceMap.Load(item.Name)
+			if ok {
+				// 存在
+			}else {
+				// 不存在 进行注册
+				
+			}
+		}
+	}
 }
