@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	pluginMar = &PluginMgr{}  // 饿汉式 单利 保证多线程的安全性
+	pluginMar = &PluginMgr{} // 饿汉式 单利 保证多线程的安全性
 )
 
 // 插件管理
