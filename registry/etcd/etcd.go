@@ -14,14 +14,14 @@ import (
 )
 
 type EtcdRegistry struct {
-	options *registry.Options
-	client *clientv3.Client
+	options   *registry.Options
+	client    *clientv3.Client
 	serviceCh chan *registry.Service
 }
 
 var (
-	etcdRegistry *EtcdRegistry = &EtcdRegistry{
-		serviceCh:make(chan *registry.Service,8),
+	etcdRegistry = &EtcdRegistry{
+		serviceCh: make(chan *registry.Service, 8),
 	}
 )
 
@@ -37,20 +37,20 @@ func (e *EtcdRegistry) Name() string {
 }
 
 // 初始化配置
-func (e *EtcdRegistry) Init(ctx context.Context,opts ...registry.Option) (err error) {
+func (e *EtcdRegistry) Init(ctx context.Context, opts ...registry.Option) (err error) {
 	// 基础设置
 	options := registry.Options{}
 
-	for _,k := range opts {
+	for _, k := range opts {
 		k(&options)
 	}
 
 	config := clientv3.Config{
-		Endpoints: options.Address,
-		DialTimeout:options.Timeout,
+		Endpoints:   options.Address,
+		DialTimeout: options.Timeout,
 	}
 
-	e.client,err = clientv3.New(config)
+	e.client, err = clientv3.New(config)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (e *EtcdRegistry) Init(ctx context.Context,opts ...registry.Option) (err er
 }
 
 // 服务注册
-func (e *EtcdRegistry) Register(ctx context.Context,service *registry.Service) (err error) {
+func (e *EtcdRegistry) Register(ctx context.Context, service *registry.Service) (err error) {
 	select {
 	case e.serviceCh <- service:
 	default:
@@ -76,7 +76,7 @@ func (e *EtcdRegistry) Unregister(ctx context.Context, service *registry.Service
 
 // 获取服务
 func (e *EtcdRegistry) GetService(ctx context.Context, name string) (service *registry.Service, err error) {
-	return nil,nil
+	return nil, nil
 }
 
 func (e *EtcdRegistry) run() {

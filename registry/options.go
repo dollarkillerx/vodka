@@ -17,8 +17,8 @@ import "time"
 type Options struct {
 	Address      []string      // 注册地址
 	Timeout      time.Duration // 超时设置
-	RegistryPath string        // 注册地址
-	HeartBeat    int64         // 心跳
+	RegistryPath string        // 注册路径  用于层级遍历
+	HeartBeat    int64         // 心跳时间
 }
 
 type Option func(*Options)
