@@ -15,10 +15,11 @@ import "time"
 */
 
 type Options struct {
-	Address      []string      // 注册地址
+	Address      []string      // 服务地址
 	Timeout      time.Duration // 超时设置
 	RegistryPath string        // 注册路径  用于层级遍历
 	HeartBeat    int64         // 心跳时间
+	Debug        bool          // debug
 }
 
 type Option func(*Options)
@@ -32,5 +33,23 @@ func WithTimeout(timeout time.Duration) Option {
 func WithAddrs(addrs []string) Option {
 	return func(options *Options) {
 		options.Address = addrs
+	}
+}
+
+func WithRegistryPath(path string) Option {
+	return func(options *Options) {
+		options.RegistryPath = path
+	}
+}
+
+func WithHeartBeat(time int64) Option {
+	return func(options *Options) {
+		options.HeartBeat = time
+	}
+}
+
+func WithDebug(bug bool) Option {
+	return func(options *Options) {
+		options.Debug = true
 	}
 }
