@@ -9,6 +9,7 @@ package etcd
 import (
 	"context"
 	"github.com/dollarkillerx/vodka/registry"
+	"log"
 	"testing"
 	"time"
 )
@@ -50,6 +51,12 @@ func TestRegistry(t *testing.T) {
 
 	for {
 		time.Sleep(time.Second)
+		service, err := regis.GetService(context.TODO(), "api")
+		if err != nil {
+			log.Println(err)
+		}else {
+			log.Println(service)
+		}
 	}
 
 }

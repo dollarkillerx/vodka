@@ -8,6 +8,7 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/gogo/protobuf v1.3.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
+	github.com/json-iterator/go v1.1.7
 	go.etcd.io/etcd v3.3.15+incompatible
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.2.0 // indirect

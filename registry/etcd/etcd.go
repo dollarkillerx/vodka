@@ -8,18 +8,22 @@ package etcd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/dollarkillerx/vodka/registry"
+	"github.com/dollarkillerx/vodka/utils"
+	"github.com/dollarkillerx/vodka/utils/clog"
 	"go.etcd.io/etcd/clientv3"
 	"log"
 	"path"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 const (
-	MaxServiceNum = 8
+	MaxServiceNum       = 8
+	//SyncServerCacheTime = 10 * time.Minute // 为防止意外的定时缓存更新  分钟
+	SyncServerCacheTime = 10 * time.Second // 为防止意外的定时缓存更新  分钟
 )
 
 type EtcdRegistry struct {
@@ -27,10 +31,13 @@ type EtcdRegistry struct {
 	client    *clientv3.Client
 	serviceCh chan *registry.Service
 
+	lock               sync.Mutex   // nutex 防止并发超量
+	value              atomic.Value // 原子缓存  高效
 	registryServiceMap sync.Map
 }
 
 var (
+	// 单利 饿汉式
 	etcdRegistry = &EtcdRegistry{
 		serviceCh: make(chan *registry.Service, MaxServiceNum),
 	}
@@ -43,10 +50,21 @@ type RegisterService struct {
 	keepAliveChan <-chan *clientv3.LeaseKeepAliveResponse
 }
 
+// 定义缓存结构体
+type AllServiceInfo struct {
+	serviceMap map[string]*registry.Service
+}
+
 // 外部初始化
 func EtcdInit() {}
 
 func init() {
+	serverCache := &AllServiceInfo{
+		serviceMap: make(map[string]*registry.Service, MaxServiceNum),
+	}
+	// 初始化缓存
+	etcdRegistry.value.Store(serverCache)
+
 	registry.RegisterPlugin(etcdRegistry)
 	go etcdRegistry.run()
 }
@@ -94,22 +112,92 @@ func (e *EtcdRegistry) Register(ctx context.Context, service *registry.Service) 
 
 // 服务反注册
 func (e *EtcdRegistry) Unregister(ctx context.Context, service *registry.Service) (err error) {
+	e.registryServiceMap.Delete(service.Name)
 	return
 }
 
-// 获取服务
+// 缓存中查询
+func (e *EtcdRegistry) getServiceByCache(ctx context.Context, name string) (service *registry.Service, err error) {
+	name = e.servicePath(name)
+	serverInfo := e.value.Load().(*AllServiceInfo)
+	i, ok := serverInfo.serviceMap[name]
+	if ok {
+		return i, nil
+	}
+	return nil, fmt.Errorf("cache not data")
+}
+
+// etcd中查询
+func (e *EtcdRegistry) getServiceByEtcd(ctx context.Context, name string, tag int) (service *registry.Service, err error) {
+	if e.options.Debug && tag == 1 {
+		log.Println("cache 被穿透 现在 进入 etcd 获取 数据 缓存名称: " + name)
+	}
+	pathName := e.servicePath(name)
+	response, err := e.client.Get(context.TODO(), name, clientv3.WithPrefix())
+	if err != nil {
+		// 如果不存在 则返回err
+		return nil, fmt.Errorf("etcd not data")
+	}
+	service = &registry.Service{
+		Name: name,
+	}
+	for _, kv := range response.Kvs {
+		val := kv.Value
+		var item registry.Node
+		err := utils.Jsonp.Unmarshal(val, &item)
+		if err != nil {
+			clog.PrintWa(err)
+			return nil, fmt.Errorf("unmarshal error")
+		}
+		service.Nodes = append(service.Nodes, &item)
+	}
+
+	// 已经去除 开始写入缓存
+
+	serverInfo := e.value.Load().(*AllServiceInfo)
+	serverInfo.serviceMap[pathName] = service
+
+	e.value.Store(serverInfo)
+
+	return service, nil
+}
+
+// 服务发现
 func (e *EtcdRegistry) GetService(ctx context.Context, name string) (service *registry.Service, err error) {
-	return nil, nil
+	// 服务发现 先想缓存中获取  如果缓存被穿透 就想etcd中获取
+	service, err = e.getServiceByCache(ctx, name)
+	if err == nil {
+		return
+	}
+	// 如果不存在 就查询  一个查询进行
+	e.lock.Lock()
+	defer e.lock.Unlock()
+	service, err = e.getServiceByCache(ctx, name)
+	if err == nil {
+		return
+	} else {
+		// 如果不存在 则 向etcd 中查询
+		service, err = e.getServiceByEtcd(ctx, name, 1)
+		return
+	}
 }
 
 func (e *EtcdRegistry) run() {
+	ticker := time.NewTicker(SyncServerCacheTime)
 	for {
 		select {
 		case item := <-e.serviceCh:
 			// 先查询是否存在  如果存在则续租，反之进行注册
-			_, ok := e.registryServiceMap.Load(item.Name)
+			ser, ok := e.registryServiceMap.Load(item.Name)
 			if ok {
-				// 存在
+				// 存在 添加节点信息
+				server := ser.(*RegisterService)
+				for _, i := range item.Nodes {
+					server.service.Nodes = append(server.service.Nodes, i)
+				}
+				server.registered = false
+
+				e.registryServiceMap.Store(item.Name, server)
 				continue
 			} else {
 				// 不存在 进行注册
@@ -118,10 +206,23 @@ func (e *EtcdRegistry) run() {
 				}
 				e.registryServiceMap.Store(item.Name, registryed)
 			}
+		case <- ticker.C:
+			e.syncUpdateCache()
 		default:
 			// 续约
 			e.registerOrKeepAlive()
 			time.Sleep(time.Millisecond * 200)
+		}
+	}
+}
+
+// 定时更新缓存   这个是保护措施
+func (e *EtcdRegistry) syncUpdateCache() {
+	serverInfo := e.value.Load().(*AllServiceInfo)
+	for k, _ := range serverInfo.serviceMap {
+		_, err := e.getServiceByEtcd(context.TODO(), k, 2)
+		if err != nil {
+			clog.PrintWa(err)
 		}
 	}
 }
@@ -180,7 +281,7 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 			},
 		}
 		path := e.serviceNodePath(ser)
-		bytes, err := json.Marshal(ser)
+		bytes, err := utils.Jsonp.Marshal(ser)
 		if err != nil {
 			continue
 		}
@@ -201,6 +302,14 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 	if e.options.Debug {
 		log.Printf("注册完毕 server: %v  host: %v  port: %v", server.service.Name, server.service.Nodes[0].Ip, server.service.Nodes[0].Port)
 	}
+
+	// 注册完毕后写入缓存
+	name := e.servicePath(server.service.Name)
+	serverInfo := e.value.Load().(*AllServiceInfo)
+	serverInfo.serviceMap[name] = server.service
+	// 缓存写入完毕后存入
+	e.value.Store(serverInfo)
+
 	return nil
 }
 
@@ -208,4 +317,9 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 func (e *EtcdRegistry) serviceNodePath(service *registry.Service) string {
 	nodeIP := fmt.Sprintf("%s:%d", service.Nodes[0].Ip, service.Nodes[0].Port)
 	return path.Join(e.options.RegistryPath, "/", service.Name, "/", nodeIP)
+}
+
+// 获取 service 路径
+func (e *EtcdRegistry) servicePath(name string) string {
+	return path.Join(e.options.RegistryPath, "/", name, "/")
 }
