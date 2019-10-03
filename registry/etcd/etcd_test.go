@@ -54,7 +54,7 @@ func TestRegistry(t *testing.T) {
 		service, err := regis.GetService(context.TODO(), "api")
 		if err != nil {
 			log.Println(err)
-		}else {
+		} else {
 			log.Println(service)
 		}
 	}

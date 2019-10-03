@@ -7,12 +7,12 @@
 package clog
 
 import (
-"bytes"
-"fmt"
-"log"
-"path"
-"runtime"
-"strconv"
+	"bytes"
+	"fmt"
+	"log"
+	"path"
+	"runtime"
+	"strconv"
 )
 
 type Clog struct{}

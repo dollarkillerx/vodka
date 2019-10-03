@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	MaxServiceNum       = 8
+	MaxServiceNum = 8
 	//SyncServerCacheTime = 10 * time.Minute // 为防止意外的定时缓存更新  分钟
 	SyncServerCacheTime = 10 * time.Second // 为防止意外的定时缓存更新  分钟
 )
@@ -206,7 +206,7 @@ func (e *EtcdRegistry) run() {
 				}
 				e.registryServiceMap.Store(item.Name, registryed)
 			}
-		case <- ticker.C:
+		case <-ticker.C:
 			e.syncUpdateCache()
 		default:
 			// 续约
