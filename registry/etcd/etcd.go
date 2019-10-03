@@ -142,7 +142,7 @@ func (e *EtcdRegistry) registerOrKeepAlive() {
 			panic(err)
 		}
 
-		return true  // 一直往下找
+		return true // 一直往下找
 	})
 }
 
@@ -155,7 +155,7 @@ func (e *EtcdRegistry) keepAlive(server *RegisterService) {
 			server.registered = false
 		}
 		if e.options.Debug {
-			log.Printf("续租 server: %v, node %v, port: %v",server.service.Name,server.service.Nodes[0].Ip,server.service.Nodes[0].Port)
+			log.Printf("续租 server: %v, node %v, port: %v", server.service.Name, server.service.Nodes[0].Ip, server.service.Nodes[0].Port)
 		}
 	}
 }
@@ -171,12 +171,11 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 	id := response.ID
 	server.id = id
 
-
-	for _,node := range server.service.Nodes {
+	for _, node := range server.service.Nodes {
 		// 为每个节点够着一个server 注入  /dkg/server1/127.0.0.1:8081  /dkg/server1/127.0.0.2:8081
 		ser := &registry.Service{
-			Name:server.service.Name,
-			Nodes:[]*registry.Node{
+			Name: server.service.Name,
+			Nodes: []*registry.Node{
 				node,
 			},
 		}
@@ -200,14 +199,13 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 	server.keepAliveChan = responses
 	server.registered = true
 	if e.options.Debug {
-		log.Printf("注册完毕 server: %v  host: %v  port: %v",server.service.Name,server.service.Nodes[0].Ip,server.service.Nodes[0].Port)
+		log.Printf("注册完毕 server: %v  host: %v  port: %v", server.service.Name, server.service.Nodes[0].Ip, server.service.Nodes[0].Port)
 	}
 	return nil
 }
 
-
 // 获取etcd 配置路径
 func (e *EtcdRegistry) serviceNodePath(service *registry.Service) string {
 	nodeIP := fmt.Sprintf("%s:%d", service.Nodes[0].Ip, service.Nodes[0].Port)
-	return path.Join(e.options.RegistryPath,"/", service.Name,"/", nodeIP)
+	return path.Join(e.options.RegistryPath, "/", service.Name, "/", nodeIP)
 }

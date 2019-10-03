@@ -33,7 +33,7 @@ func TestRegistry(t *testing.T) {
 	}
 
 	server := &registry.Service{
-		Name:"api",
+		Name: "api",
 	}
 
 	server.Nodes = append(server.Nodes, &registry.Node{
@@ -46,13 +46,10 @@ func TestRegistry(t *testing.T) {
 		},
 	)
 
-
-	regis.Register(context.TODO(),server)
+	regis.Register(context.TODO(), server)
 
 	for {
 		time.Sleep(time.Second)
 	}
 
 }
-
-
