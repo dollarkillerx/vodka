@@ -1,0 +1,30 @@
+/**
+ * @Author: DollarKiller
+ * @Description:
+ * @Github: https://github.com/dollarkillerx
+ * @Date: Create in 18:32 2019-10-03
+ */
+
+syntax = "proto3";
+
+package phone;
+
+enum PhoneType {
+    HOME = 0;
+    WORK = 1;
+}
+
+message Phone {
+    PhoneType type = 1;
+    string number = 2;
+}
+
+message Person {
+    int32 id = 1;
+    string name = 2;
+    repeated Phone phones = 3;
+}
+
+message ContactBook {
+    repeated Person persons = 1;
+}
