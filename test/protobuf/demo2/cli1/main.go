@@ -29,6 +29,7 @@ func main() {
 	})
 
 	if e != nil {
+		// 如果连接发送错误
 		panic(e)
 	}
 
