@@ -9,7 +9,7 @@ package main
 import (
 	"fmt"
 	"github.com/dollarkillerx/vodka/utils"
-	"github.com/emicklei/proto"
+	"github.com/dollarkillerx/proto"
 	"log"
 	"os"
 )
