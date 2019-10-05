@@ -13,4 +13,3 @@ type Option struct {
 	GenServerCode  bool
 	Prefix         string
 }
-

@@ -28,23 +28,21 @@ type DirGenerator struct {
 }
 
 func (d *DirGenerator) Run(opt *Option) error {
-	for _,i := range dirList {
+	for _, i := range dirList {
 		opts := utils.PathSlash(opt.Output)
 		path := opts + "/" + i
-		err := os.MkdirAll(path,00755)
+		err := os.MkdirAll(path, 00755)
 		if err != nil {
-			log.Fatalf("Failed to create directory error: %v \n",err)
+			log.Fatalf("Failed to create directory error: %v \n", err)
 		}
 	}
 	return nil
 }
 
-
-
 func init() {
 	dirGenerator := DirGenerator{
-		dirList:dirList,
+		dirList: dirList,
 	}
 
-	Register("dir_generator",&dirGenerator)
+	Register("dir_generator", &dirGenerator)
 }

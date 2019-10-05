@@ -15,19 +15,17 @@ import (
 )
 
 type server struct {
-
 }
 
-func (s *server) SayHello(ctx context.Context,req *hello.HelloReq) (*hello.HelloResp,error) {
+func (s *server) SayHello(ctx context.Context, req *hello.HelloReq) (*hello.HelloResp, error) {
 
 	// 逻辑处理
 	log.Println(req)
 
 	return &hello.HelloResp{
-		Reply:"hello" + req.Name,
-	},nil
+		Reply: "hello" + req.Name,
+	}, nil
 }
-
 
 func main() {
 	listener, e := net.Listen("tcp", ":50050")
@@ -37,8 +35,7 @@ func main() {
 
 	newServer := grpc.NewServer()
 
-	hello.RegisterHelloServiceServer(newServer,&server{})
+	hello.RegisterHelloServiceServer(newServer, &server{})
 
 	newServer.Serve(listener)
 }
-

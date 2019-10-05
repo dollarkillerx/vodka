@@ -45,14 +45,14 @@ func main() {
 			Destination: &opt.Output,
 		},
 		cli.BoolFlag{
-			Name:"c",
-			Usage:"generate grpc cli code",
-			Destination:&opt.GenClientCode,
+			Name:        "c",
+			Usage:       "generate grpc cli code",
+			Destination: &opt.GenClientCode,
 		},
 		cli.BoolFlag{
-			Name:"s",
-			Usage:"generate grpc server code",
-			Destination:&opt.GenServerCode,
+			Name:        "s",
+			Usage:       "generate grpc server code",
+			Destination: &opt.GenServerCode,
 		},
 	}
 

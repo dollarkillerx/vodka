@@ -15,17 +15,16 @@ import (
 )
 
 type GrpcGenerator struct {
-
 }
 
 func (g *GrpcGenerator) Run(opt *Option) error {
 	// protoc --go_out=plugins=grpc:. protu.proto
 
-	path := fmt.Sprintf("%s/generate",utils.PathSlash(opt.Output))
-	os.MkdirAll(path,00755)
-	dir := fmt.Sprintf("plugins=grpc:%s",path)
+	path := fmt.Sprintf("%s/generate", utils.PathSlash(opt.Output))
+	os.MkdirAll(path, 00755)
+	dir := fmt.Sprintf("plugins=grpc:%s", path)
 
-	cmd := exec.Command("protoc","--go_out",dir,opt.Proto3Filename)
+	cmd := exec.Command("protoc", "--go_out", dir, opt.Proto3Filename)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 
@@ -39,7 +38,5 @@ func (g *GrpcGenerator) Run(opt *Option) error {
 func init() {
 	grpcGenerator := GrpcGenerator{}
 
-	Register("grpc_generator",&grpcGenerator)
+	Register("grpc_generator", &grpcGenerator)
 }
-
-

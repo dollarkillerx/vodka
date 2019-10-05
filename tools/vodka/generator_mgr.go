@@ -32,14 +32,13 @@ func (g *GeneratorMgr) Run(opt *Option) error {
 	return err
 }
 
-
-func  Register(name string, generator Generator) error {
+func Register(name string, generator Generator) error {
 	_, ok := genMgr.genMap.Load(name)
 	if ok {
 		return fmt.Errorf("generator %s is exists", name)
 	}
 
-	genMgr.genMap.Store(name,generator)
+	genMgr.genMap.Store(name, generator)
 
 	return nil
 }

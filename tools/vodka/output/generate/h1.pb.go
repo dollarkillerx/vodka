@@ -198,6 +198,6 @@ var _HelloService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _HelloService_SayHello_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
-	ata: "h1.proto",
+	Streams: []grpc.StreamDesc{},
+	ata:     "h1.proto",
 }

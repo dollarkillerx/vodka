@@ -19,7 +19,7 @@ func main() {
 	person.Id = 232324
 	var phonez phone.Phone
 	phonez.Number = "123213123"
-	person.Phones = append(person.Phones,&phonez)
+	person.Phones = append(person.Phones, &phonez)
 
 	bytes, e := proto.Marshal(&person)
 	if e != nil {
@@ -32,7 +32,7 @@ func main() {
 	}
 
 	file, e := ioutil.ReadFile("test/protobuf/testfile")
-	if e!= nil {
+	if e != nil {
 		panic(e)
 	}
 	var dataz phone.Person

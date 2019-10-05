@@ -8,8 +8,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/dollarkillerx/vodka/utils"
 	"github.com/dollarkillerx/proto"
+	"github.com/dollarkillerx/vodka/utils"
 	"log"
 	"os"
 )
@@ -61,17 +61,15 @@ func (c *ControllerGenerator) generator(opt *Option) error {
 		log.Fatal(e)
 	}
 	defer file.Close()
-	fmt.Fprintf(file,"package controller \n")
-	fmt.Fprintf(file,"import ( \n")
-	fmt.Fprintf(file,"\"context\" \n")
-	fmt.Fprintf(file,"\"github.com/dollarkillerx/vodka/test/protobuf/demo2/hello\" \n")
-	fmt.Fprintf(file,") \n")
+	fmt.Fprintf(file, "package controller \n")
+	fmt.Fprintf(file, "import ( \n")
+	fmt.Fprintf(file, "\"context\" \n")
+	fmt.Fprintf(file, "\"github.com/dollarkillerx/vodka/test/protobuf/demo2/hello\" \n")
+	fmt.Fprintf(file, ") \n")
 
-	for _,k := range c.rpc {
-		fmt.Fprintf(file,"func %s(ctx context.Context,req *hello.%s) (*hello.%s,error) {\n }\n",k.Name,k.RequestType,k.ReturnsType)
+	for _, k := range c.rpc {
+		fmt.Fprintf(file, "func %s(ctx context.Context,req *hello.%s) (*hello.%s,error) {\n }\n", k.Name, k.RequestType, k.ReturnsType)
 	}
-
-
 
 	return nil
 }
