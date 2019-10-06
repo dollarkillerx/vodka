@@ -23,7 +23,7 @@ import (
 const (
 	MaxServiceNum = 8
 	//SyncServerCacheTime = 10 * time.Minute // 为防止意外的定时缓存更新  分钟
-	SyncServerCacheTime = 10 * time.Second // 为防止意外的定时缓存更新  分钟
+	SyncServerCacheTime = 20 * time.Second // 为防止意外的定时缓存更新  分钟
 )
 
 type EtcdRegistry struct {
@@ -140,7 +140,7 @@ func (e *EtcdRegistry) Unregister(ctx context.Context, service *registry.Node) (
 
 // 缓存中查询
 func (e *EtcdRegistry) getServiceByCache(ctx context.Context, name string) (service *registry.Service, err error) {
-	name = e.servicePath(name)
+	//name = e.servicePath(name)
 	serverInfo := e.value.Load().(*AllServiceInfo)
 	i, ok := serverInfo.serviceMap[name]
 	if ok {
@@ -179,7 +179,8 @@ func (e *EtcdRegistry) getServiceByEtcd(ctx context.Context, name string, tag in
 	// 已经去除 开始写入缓存
 
 	serverInfo := e.value.Load().(*AllServiceInfo)
-	serverInfo.serviceMap[pathName] = service
+	serverInfo.serviceMap[name] = service
+	e.value.Store(serverInfo)
 
 	return service, nil
 }
@@ -187,10 +188,12 @@ func (e *EtcdRegistry) getServiceByEtcd(ctx context.Context, name string, tag in
 // 服务发现
 func (e *EtcdRegistry) GetService(ctx context.Context, name string) (service *registry.Service, err error) {
 	// 服务发现 先想缓存中获取  如果缓存被穿透 就想etcd中获取
+	//clog.PrintEr(name)
 	service, err = e.getServiceByCache(ctx, name)
 	if err == nil {
 		return
 	}
+
 	// 如果不存在 就查询  一个查询进行
 	e.lock.Lock()
 	defer e.lock.Unlock()
@@ -246,6 +249,7 @@ func (e *EtcdRegistry) run() {
 
 // 定时更新缓存   这个是保护措施
 func (e *EtcdRegistry) syncUpdateCache() {
+	log.Println("更新缓存")
 	serverInfo := e.value.Load().(*AllServiceInfo)
 	for k, _ := range serverInfo.serviceMap {
 		_, err := e.getServiceByEtcd(context.TODO(), k, 2)
@@ -308,13 +312,25 @@ func (e *EtcdRegistry) registerOrKeepAlive(ser *registry.Node) {
 
 // 续约
 func (e *EtcdRegistry) keepAlive(server *RegisterService) {
+	log.Println(server.id)
 	select {
-	case resp := <-server.keepAliveChan:
-		if resp == nil {
-			// 服务宕机  再次收到注册新号 进行注册
+	case <-server.keepAliveChan:
+		//clog.PrintWa(server.id)
+		//clog.PrintWa("续租的")
+
+		// 查询服务是否存在 如果不存在 则创建
+		// 服务宕机  再次收到注册新号 进行注册
+		key, path := e.getServerName(server.node)
+		response, err := e.client.Get(context.TODO(), path)
+		if err != nil {
+			clog.PrintWa(err)
+		}
+		if len(response.Kvs) == 0 {
 			server.registered = false
 			go e.registerServer(server)
 		}
+		e.registryServiceMap.Store(key, server)
+
 		if e.options.Debug {
 			clog.Println(fmt.Sprintf("续租 server: %v, node %v, port: %v", server.node.Name, server.node.Ip, server.node.Port))
 		}
@@ -330,6 +346,9 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 	}
 
 	server.id = response.ID
+
+	//clog.PrintEr(server.id)
+	//clog.PrintEr("这是注册的id")
 
 	key, path := e.getServerName(server.node)
 	bytes, err := utils.Jsonp.Marshal(server.node)
