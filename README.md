@@ -2,6 +2,9 @@
 ![](./README/vodka.png)
 vodka 轻量级golang微服务框架  Lightweight golang microservices framework
 
+CAP分布式理论  基于AP的微服务框架
+
+最终一致性
 
 ![](./README/vodkasc.jpg)
 ### 轻量级可扩展微服务框架

@@ -22,7 +22,7 @@ func TestRegistry(t *testing.T) {
 		context.TODO(),
 		"etcd",
 		registry.WithDebug(true),
-		registry.WithHeartBeat(5),
+		registry.WithHeartBeat(15),
 		registry.WithAddrs([]string{"127.0.0.1:2379"}),
 		registry.WithTimeout(time.Second),
 		registry.WithRegistryPath("/dkg/demo1/"),
@@ -33,21 +33,21 @@ func TestRegistry(t *testing.T) {
 		return
 	}
 
-	server := &registry.Service{
-		Name: "api",
+	node := registry.Node{
+		Name:   "api",
+		Ip:     "127.0.0.1",
+		Port:   8081,
+		Weight: 1,
 	}
 
-	server.Nodes = append(server.Nodes, &registry.Node{
-		Ip:   "127.0.0.1",
-		Port: 8801,
-	},
-		&registry.Node{
-			Ip:   "127.0.0.2",
-			Port: 8801,
-		},
-	)
+	regis.Register(context.TODO(), &node)
 
-	regis.Register(context.TODO(), server)
+	go func() {
+		for {
+			time.Sleep(time.Second * 5)
+			regis.Register(context.TODO(), &node)
+		}
+	}()
 
 	for {
 		time.Sleep(time.Second)
@@ -55,7 +55,10 @@ func TestRegistry(t *testing.T) {
 		if err != nil {
 			log.Println(err)
 		} else {
-			log.Println(service)
+			log.Println(service.Name)
+			for _, item := range service.Nodes {
+				log.Println(item)
+			}
 		}
 	}
 

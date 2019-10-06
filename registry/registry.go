@@ -11,7 +11,7 @@ import "context"
 type Registry interface {
 	Name() string                                                              // 插件名称
 	Init(ctx context.Context, opts ...Option) (err error)                      // 初始化
-	Register(ctx context.Context, service *Service) (err error)                // 服务注册
-	Unregister(ctx context.Context, service *Service) (err error)              // 服务反注册
+	Register(ctx context.Context, service *Node) (err error)                   // 服务注册
+	Unregister(ctx context.Context, service *Node) (err error)                 // 服务反注册
 	GetService(ctx context.Context, name string) (service *Service, err error) // 服务发现 通过服务的名称获取服务的信息 (ip,port)
 }
