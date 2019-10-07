@@ -123,17 +123,6 @@ func (e *EtcdRegistry) Unregister(ctx context.Context, service *registry.Node) (
 	name, path := e.getServerName(service)
 	e.registryServiceMap.Delete(name)
 
-	// v0.0.1 废弃
-	//defer e.registryServiceMap.Delete(name)
-	//value, ok := e.registryServiceMap.Load(name)
-	//if ok {
-	//	node := value.(registry.Node)
-	//	_, err = e.client.Delete(context.TODO(), node.PathName)
-	//	if err != nil {
-	//		clog.PrintWa(err)
-	//	}
-	//}
-
 	_, err = e.client.Delete(context.TODO(), path)
 	return err
 }
@@ -188,7 +177,6 @@ func (e *EtcdRegistry) getServiceByEtcd(ctx context.Context, name string, tag in
 // 服务发现
 func (e *EtcdRegistry) GetService(ctx context.Context, name string) (service *registry.Service, err error) {
 	// 服务发现 先想缓存中获取  如果缓存被穿透 就想etcd中获取
-	//clog.PrintEr(name)
 	service, err = e.getServiceByCache(ctx, name)
 	if err == nil {
 		return
@@ -212,37 +200,10 @@ func (e *EtcdRegistry) run() {
 	for {
 		select {
 		case item := <-e.serviceCh:
-			// v0.0.1 弃用
-			//// 先查询是否存在  如果存在则续租，反之进行注册
-			//ser, ok := e.registryServiceMap.Load(item.Name)
-			//if ok {
-			//	// 存在 添加节点信息
-			//	server := ser.(*RegisterService)
-			//	for _, i := range item.Nodes {
-			//		server.service.Nodes = append(server.service.Nodes, i)
-			//	}
-			//
-			//	server.service.Nodes = append(server.service.Nodes, i)
-			//
-			//	server.registered = false
-			//
-			//	e.registryServiceMap.Store(item.Name, server)
-			//	continue
-			//} else {
-			//	// 不存在 进行注册
-			//	registryed := &RegisterService{
-			//		service: item,
-			//	}
-			//	e.registryServiceMap.Store(item.Name, registryed)
-			//}
 			e.registerOrKeepAlive(item)
 		case <-ticker.C:
 			// 更新缓存
 			e.syncUpdateCache()
-			//default:   1.0.1 版本后就失效了
-			//	// 续约
-			//	e.registerOrKeepAlive()
-			//	time.Sleep(time.Millisecond * 200)
 		}
 	}
 }
@@ -261,23 +222,6 @@ func (e *EtcdRegistry) syncUpdateCache() {
 
 // 注册 或者 续租
 func (e *EtcdRegistry) registerOrKeepAlive(ser *registry.Node) {
-	// v 0.0.1 弃用
-	//e.registryServiceMap.Range(func(key, value interface{}) bool {
-	//	item := value.(*RegisterService)
-	//
-	//	// 如果注册就续约
-	//	if item.registered {
-	//		e.keepAlive(item)
-	//		return true
-	//	}
-	//	// 反之就进行注册
-	//	err := e.registerServer(item)
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//
-	//	return true // 一直往下找
-	//})
 
 	service := &RegisterService{
 		name:       ser.Name,
@@ -315,8 +259,6 @@ func (e *EtcdRegistry) keepAlive(server *RegisterService) {
 	log.Println(server.id)
 	select {
 	case <-server.keepAliveChan:
-		//clog.PrintWa(server.id)
-		//clog.PrintWa("续租的")
 
 		// 查询服务是否存在 如果不存在 则创建
 		// 服务宕机  再次收到注册新号 进行注册
@@ -346,9 +288,6 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 	}
 
 	server.id = response.ID
-
-	//clog.PrintEr(server.id)
-	//clog.PrintEr("这是注册的id")
 
 	key, path := e.getServerName(server.node)
 	bytes, err := utils.Jsonp.Marshal(server.node)
@@ -381,12 +320,6 @@ func (e *EtcdRegistry) registerServer(server *RegisterService) error {
 
 	return nil
 }
-
-//// 获取etcd 配置路径
-//func (e *EtcdRegistry) serviceNodePath(service *registry.Node) string {
-//	nodeIP := fmt.Sprintf("%s:%d", service.Ip, service.Port)
-//	return path.Join(e.options.RegistryPath, "/", service.Name, "/", nodeIP)
-//}
 
 // 获取服务名称   唯一id,路径
 func (e *EtcdRegistry) getServerName(service *registry.Node) (id, paths string) {

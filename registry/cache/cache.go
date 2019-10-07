@@ -108,20 +108,14 @@ func (c *CacheRegistry) Unregister(ctx context.Context, service *registry.Node) 
 	name, _ := c.getServerName(service)
 	c.registryServiceMap.Delete(name)
 
-	//_, err = c.client.Delete(context.TODO(), path)
 	return err
 }
 
 func (c *CacheRegistry) run() {
-	//ticker := time.NewTicker(SyncServerCacheTime)
 	for {
 		select {
 		case item := <-c.serviceCh:
-
 			c.registerOrKeepAlive(item)
-		//case <-ticker.C:
-		//	// 更新缓存
-		//	c.syncUpdateCache()
 		}
 	}
 }
@@ -140,42 +134,8 @@ func (c *CacheRegistry) registerOrKeepAlive(node *registry.Node) {
 	}
 }
 
-//// 更新缓存    考虑到这个是一个小系统  就不用缓存了
-//func (c *CacheRegistry) syncUpdateCache() {
-//	log.Println("更新缓存")
-//	// 获取中心数据
-//	data := &AllServiceInfo{}
-//	data.serviceMap = map[string]*registry.Service{}
-//	all := c.gcache.GetALL(true)
-//	for _, i := range all {
-//		node, bo := i.(*registry.Node)
-//		if bo {
-//			_,ok := data.serviceMap[node.Name]
-//			if ok {
-//				// 如果转码正确
-//				data.serviceMap[node.Name].Nodes = append(data.serviceMap[node.Name].Nodes, node)
-//			}else {
-//				data.serviceMap[node.Name] = &registry.Service{
-//					Name:node.Name,
-//				}
-//				data.serviceMap[node.Name].Nodes = append(data.serviceMap[node.Name].Nodes,node)
-//			}
-//		}
-//	}
-//
-//	c.value.Store(data)
-//}
-
 // 服务发现
 func (c *CacheRegistry) GetService(ctx context.Context, name string) (service *registry.Service, err error) {
-	// 考虑到小系统就不用cache了
-	//info := c.value.Load().(*AllServiceInfo)
-	//
-	//i,ok := info.serviceMap[name]
-	//if ok {
-	//	return i,nil
-	//}
-	//return nil, fmt.Errorf("not data")
 
 	data := &AllServiceInfo{}
 	data.serviceMap = map[string]*registry.Service{}
