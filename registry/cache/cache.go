@@ -119,9 +119,9 @@ func (c *CacheRegistry) run() {
 		case item := <-c.serviceCh:
 
 			c.registerOrKeepAlive(item)
-		//case <-ticker.C:
-		//	// 更新缓存
-		//	c.syncUpdateCache()
+			//case <-ticker.C:
+			//	// 更新缓存
+			//	c.syncUpdateCache()
 		}
 	}
 }
@@ -183,24 +183,24 @@ func (c *CacheRegistry) GetService(ctx context.Context, name string) (service *r
 	for _, i := range all {
 		node, bo := i.(*registry.Node)
 		if bo {
-			_,ok := data.serviceMap[node.Name]
+			_, ok := data.serviceMap[node.Name]
 			if ok {
 				// 如果转码正确
 				data.serviceMap[node.Name].Nodes = append(data.serviceMap[node.Name].Nodes, node)
-			}else {
+			} else {
 				data.serviceMap[node.Name] = &registry.Service{
-					Name:node.Name,
+					Name: node.Name,
 				}
-				data.serviceMap[node.Name].Nodes = append(data.serviceMap[node.Name].Nodes,node)
+				data.serviceMap[node.Name].Nodes = append(data.serviceMap[node.Name].Nodes, node)
 			}
 		}
 	}
 
-	i,ok := data.serviceMap[name]
+	i, ok := data.serviceMap[name]
 	if ok {
-		return i,nil
+		return i, nil
 	}
-	return nil,fmt.Errorf("not data")
+	return nil, fmt.Errorf("not data")
 }
 
 // 获取服务名称   唯一id,路径

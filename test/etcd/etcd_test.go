@@ -30,15 +30,11 @@ func TestEt1(t *testing.T) {
 		panic(e)
 	}
 
-
-
-	p1, e := client.Put(context.TODO(), "/vv/v1", "vvv1",clientv3.WithLease(g1.ID))
+	p1, e := client.Put(context.TODO(), "/vv/v1", "vvv1", clientv3.WithLease(g1.ID))
 	if e != nil {
 		panic(e)
 	}
 	p1 = p1
-
-
 
 	k1, e := client.KeepAlive(context.TODO(), g1.ID)
 	if e != nil {
@@ -50,7 +46,7 @@ func TestEt1(t *testing.T) {
 		if e != nil {
 			panic(e)
 		}
-		_, e = client.Put(context.TODO(), "/vv/v2", "vvv2",clientv3.WithLease(g2.ID))
+		_, e = client.Put(context.TODO(), "/vv/v2", "vvv2", clientv3.WithLease(g2.ID))
 		if e != nil {
 			panic(e)
 		}
@@ -63,7 +59,7 @@ func TestEt1(t *testing.T) {
 			if i != nil {
 				panic(i)
 			}
-			for _,kv := range resp.Kvs {
+			for _, kv := range resp.Kvs {
 				log.Println(kv.Value)
 			}
 
@@ -71,10 +67,8 @@ func TestEt1(t *testing.T) {
 	}()
 
 	for {
-		time.Sleep(time.Second *5)
-		<- k1
+		time.Sleep(time.Second * 5)
+		<-k1
 	}
-
-
 
 }
