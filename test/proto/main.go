@@ -7,9 +7,10 @@
 package main
 
 import (
-	"github.com/emicklei/proto"
 	"log"
 	"os"
+
+	"github.com/emicklei/proto"
 )
 
 func main() {

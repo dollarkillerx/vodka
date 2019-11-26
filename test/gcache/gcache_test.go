@@ -7,17 +7,18 @@
 package gcache
 
 import (
-	"github.com/bluele/gcache"
 	"log"
 	"testing"
+
+	"github.com/bluele/gcache"
 )
 
 func TestGet(t *testing.T) {
 	cache := gcache.New(20).LRU().Build()
 
-	cache.Set("ok","asd")
-	cache.Set("ok1","asd11")
-	cache.Set("ok2","asd22")
+	cache.Set("ok", "asd")
+	cache.Set("ok1", "asd11")
+	cache.Set("ok2", "asd22")
 
 	//get, e := cache.Get("ok")
 	//if e != nil {
@@ -27,7 +28,7 @@ func TestGet(t *testing.T) {
 	//}
 
 	all := cache.GetALL(true)
-	for _,i := range all {
+	for _, i := range all {
 		log.Println(i)
 	}
 }

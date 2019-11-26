@@ -8,10 +8,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/dollarkillerx/vodka/utils"
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/dollarkillerx/vodka/utils"
 )
 
 type GrpcGenerator struct {

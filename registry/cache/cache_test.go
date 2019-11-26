@@ -77,4 +77,3 @@ func TestRegistry(t *testing.T) {
 	}
 
 }
-

@@ -8,6 +8,7 @@ package loadbalance
 
 import (
 	"context"
+
 	"github.com/dollarkillerx/vodka/registry"
 )
 

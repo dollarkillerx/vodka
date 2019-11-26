@@ -9,15 +9,16 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"github.com/dollarkillerx/vodka/registry"
-	"github.com/dollarkillerx/vodka/utils"
-	"github.com/dollarkillerx/vodka/utils/clog"
-	"go.etcd.io/etcd/clientv3"
 	"log"
 	"path"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/dollarkillerx/vodka/registry"
+	"github.com/dollarkillerx/vodka/utils"
+	"github.com/dollarkillerx/vodka/utils/clog"
+	"go.etcd.io/etcd/clientv3"
 )
 
 const (

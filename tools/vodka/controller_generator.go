@@ -8,10 +8,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/dollarkillerx/proto"
-	"github.com/dollarkillerx/vodka/utils"
 	"log"
 	"os"
+
+	"github.com/dollarkillerx/proto"
+	"github.com/dollarkillerx/vodka/utils"
 )
 
 type ControllerGenerator struct {

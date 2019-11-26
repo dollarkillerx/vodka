@@ -8,9 +8,10 @@ package loadbalance
 
 import (
 	"context"
-	"github.com/dollarkillerx/vodka/registry"
 	"math/rand"
 	"time"
+
+	"github.com/dollarkillerx/vodka/registry"
 )
 
 type Random struct {

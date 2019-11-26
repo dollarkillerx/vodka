@@ -7,9 +7,10 @@
 package main
 
 import (
-	"github.com/dollarkillerx/vodka/utils"
 	"log"
 	"os"
+
+	"github.com/dollarkillerx/vodka/utils"
 )
 
 var dirList = []string{

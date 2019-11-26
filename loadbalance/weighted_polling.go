@@ -9,8 +9,9 @@ package loadbalance
 import (
 	"context"
 	"fmt"
-	"github.com/dollarkillerx/vodka/registry"
 	"sync/atomic"
+
+	"github.com/dollarkillerx/vodka/registry"
 )
 
 type WeightedPolling struct {
