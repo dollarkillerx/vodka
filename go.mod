@@ -7,12 +7,14 @@ require (
 	github.com/coreos/etcd v3.3.15+incompatible
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
+	github.com/dollarkillerx/easylog v0.0.0-20200103121335-bbde5b9f0db8
 	github.com/dollarkillerx/proto v0.0.0-20191005023209-37173c8a8b75
 	github.com/emicklei/proto v1.6.17
 	github.com/gogo/protobuf v1.3.0
 	github.com/golang/protobuf v1.3.2
 	github.com/google/uuid v1.1.1 // indirect
-	github.com/json-iterator/go v1.1.7
+	github.com/json-iterator/go v1.1.9
+	github.com/sony/sonyflake v1.0.0
 	github.com/urfave/cli v1.22.1
 	go.etcd.io/etcd v3.3.15+incompatible
 	go.uber.org/atomic v1.4.0 // indirect

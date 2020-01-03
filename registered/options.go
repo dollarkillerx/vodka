@@ -50,7 +50,7 @@ func WithDebug(debug bool) SetOption {
 	}
 }
 
-func Config(config interface{}) SetOption {
+func WithConfig(config interface{}) SetOption {
 	return func(options *Options) {
 		options.Config = config
 	}

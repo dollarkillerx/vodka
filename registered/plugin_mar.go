@@ -1,6 +1,6 @@
 /**
  * @Author: DollarKillerX
- * @Description: plugin_mar.go
+ * @Description: plugin_mar 多注册中心管理
  * @Github: https://github.com/dollarkillerx
  * @Date: Create in 上午10:26 2020/1/3
  */
