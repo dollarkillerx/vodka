@@ -6,10 +6,6 @@
  */
 package redis
 
-/**
-redis这里只是作的单机的
-*/
-
 import (
 	"context"
 	"fmt"
@@ -110,27 +106,41 @@ func (r *Redis) GetService(ctx context.Context, name string) (ser *registered.Se
 	path := fmt.Sprintf("/registry/%s/*", name)
 	red := r.pool.Get()
 	defer red.Close()
-	values, err := redis.Values(red.Do("SCAN", "0", "MATCH", path))
-	if err != nil {
-		return nil, err
-	}
-	nodes, err := redis.Strings(values[1], nil)
-	if err != nil {
-		return nil, err
-	}
 	result := registered.Service{Name: name}
-	for _, id := range nodes {
-		s, err := redis.Bytes(red.Do("get", id))
+	resultMap := map[string]*registered.Node{}
+	for {
+		values, err := redis.Values(red.Do("SCAN", "0", "MATCH", path))
 		if err != nil {
-			easylog.PrintError(err)
-			continue
+			return nil, err
 		}
-		node := &registered.Node{}
-		err = utils.Json.Unmarshal(s, node)
+		nodes, err := redis.Strings(values[1], nil)
 		if err != nil {
-			easylog.PrintError(err)
+			return nil, err
 		}
-		result.Node = append(result.Node, node)
+		for _, id := range nodes {
+			s, err := redis.Bytes(red.Do("get", id))
+			if err != nil {
+				easylog.PrintError(err)
+				continue
+			}
+			node := &registered.Node{}
+			err = utils.Json.Unmarshal(s, node)
+			if err != nil {
+				easylog.PrintError(err)
+			}
+			resultMap[node.ID] = node
+		}
+		i, err := redis.Int(values[0], nil)
+		if err != nil {
+			return nil, err
+		}
+		if i == 0 {
+			break
+		}
+	}
+
+	for _, v := range resultMap {
+		result.Node = append(result.Node, v)
 	}
 	return &result, nil
 }
