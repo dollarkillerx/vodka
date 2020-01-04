@@ -18,4 +18,3 @@ func TestSonyFlakeGetId(t *testing.T) {
 	}
 	log.Println(s)
 }
-

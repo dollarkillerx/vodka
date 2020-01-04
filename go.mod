@@ -12,6 +12,7 @@ require (
 	github.com/emicklei/proto v1.6.17
 	github.com/gogo/protobuf v1.3.0
 	github.com/golang/protobuf v1.3.2
+	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.9
 	github.com/sony/sonyflake v1.0.0

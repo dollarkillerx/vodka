@@ -25,16 +25,16 @@ func (r *registryMar) registry(reg Registry) {
 }
 
 // 初始化插件
-func (r *registryMar) initRegistry(name string, option ...SetOption) error {
+func (r *registryMar) initRegistry(name string, option ...SetOption) (Registry, error) {
 	value, ok := r.persistence.Load(name)
 	if !ok {
-		return errors.New("not registry")
+		return nil, errors.New("not registry")
 	}
 	registry, ok := value.(Registry)
 	if !ok {
-		return errors.New("registry error")
+		return nil, errors.New("registry error")
 	}
-	return registry.Init(context.TODO(), option...)
+	return registry, registry.Init(context.TODO(), option...)
 }
 
 // 以下是对外暴露的
@@ -43,6 +43,6 @@ func RegistryMar(reg Registry) {
 	registryMarInstantiate.registry(reg)
 }
 
-func InitRegistryMar(name string, option ...SetOption) error {
+func InitRegistryMar(name string, option ...SetOption) (Registry, error) {
 	return registryMarInstantiate.initRegistry(name, option...)
 }

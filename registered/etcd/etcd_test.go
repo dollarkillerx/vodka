@@ -1,6 +1,6 @@
 /**
  * @Author: DollarKillerX
- * @Description: etcd_test.go
+ * @Description: etcd_test
  * @Github: https://github.com/dollarkillerx
  * @Date: Create in 下午8:36 2020/1/3
  */
@@ -25,7 +25,7 @@ func TestEtcd_GetService(t *testing.T) {
 	}
 	err := etcd.Init(context.TODO(), registered.WithConfig(etcdConfig))
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 	}
 
 	s, err := etcd.Registry(context.TODO(), &registered.Node{

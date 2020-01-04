@@ -8,8 +8,9 @@ package utils
 
 import (
 	"fmt"
-	"github.com/sony/sonyflake"
 	"strconv"
+
+	"github.com/sony/sonyflake"
 )
 
 var (

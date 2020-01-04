@@ -1,6 +1,6 @@
 /**
  * @Author: DollarKillerX
- * @Description: etcd 注册中心  (感谢伟大的etcd)
+ * @Description: etcd 注册中心
  * @Github: https://github.com/dollarkillerx
  * @Date: Create in 上午11:34 2020/1/3
  */
@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/coreos/etcd/clientv3"
 	"github.com/dollarkillerx/easylog"
 	"github.com/dollarkillerx/vodka/registered"
@@ -28,8 +29,17 @@ type Etcd struct {
  * 服务反注册
  */
 
+func EtcdInit() {}
+
 func (e *Etcd) Name() string {
 	return "etcd"
+}
+
+func init() {
+	etcd := Etcd{
+		opt: &registered.Options{HeartBeat: 10},
+	}
+	registered.RegistryMar(&etcd)
 }
 
 // 初始化注册中心
@@ -81,11 +91,11 @@ func (e *Etcd) GetService(ctx context.Context, node string) (*registered.Service
 	if err != nil {
 		return nil, err
 	}
-	result := registered.Service{Name: node,}
+	result := registered.Service{Name: node}
 	for _, v := range response.Kvs {
 		node := &registered.Node{}
 
-		err := utils.Json.Unmarshal([]byte(v.Value), node)
+		err := utils.Json.Unmarshal(v.Value, node)
 		if err != nil {
 			easylog.PrintError(err)
 		}
@@ -98,7 +108,7 @@ func (e *Etcd) GetService(ctx context.Context, node string) (*registered.Service
 // 服务注册&&心跳  (逻辑解耦)
 func (e *Etcd) registry(node *registered.Node) {
 	path := e.getEtcdPath(node)
-	lease, err := clientv3.NewLease(e.client).Grant(context.TODO(), 5)
+	lease, err := clientv3.NewLease(e.client).Grant(context.TODO(), int64(e.opt.HeartBeat))
 	if err != nil {
 		easylog.PrintError(err)
 		return

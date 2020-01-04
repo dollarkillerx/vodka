@@ -6,16 +6,14 @@
  */
 package registered
 
-import "time"
-
 type Options struct {
 	Addr         []string `json:"addr"`          // 注册中心 持久化节点的地址
 	RegistryPath string   `json:"registry_path"` // 注册根路径
 
-	Timeout   time.Duration `json:"timeout"`    // 超时时间
-	HeartBeat time.Duration `json:"heart_beat"` // 服务心跳
-	Debug     bool          `json:"debug"`      // 是否是debug
-	Config    interface{}   `json:"config"`     // 一些自定义配置
+	Timeout   int         `json:"timeout"`    // 超时时间
+	HeartBeat int         `json:"heart_beat"` // 服务心跳
+	Debug     bool        `json:"debug"`      // 是否是debug
+	Config    interface{} `json:"config"`     // 一些自定义配置
 }
 
 type SetOption func(options *Options)
@@ -32,13 +30,13 @@ func WithRegistryPath(path string) SetOption {
 	}
 }
 
-func WithTimeout(timeout time.Duration) SetOption {
+func WithTimeout(timeout int) SetOption {
 	return func(options *Options) {
 		options.Timeout = timeout
 	}
 }
 
-func WithHeartBeat(timeout time.Duration) SetOption {
+func WithHeartBeat(timeout int) SetOption {
 	return func(options *Options) {
 		options.HeartBeat = timeout
 	}
