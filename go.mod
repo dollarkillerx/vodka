@@ -16,7 +16,7 @@ require (
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.9
 	github.com/sony/sonyflake v1.0.0
-	github.com/urfave/cli v1.22.1
+	github.com/urfave/cli v1.22.2
 	go.etcd.io/etcd v3.3.15+incompatible
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.2.0 // indirect
