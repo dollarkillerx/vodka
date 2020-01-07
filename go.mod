@@ -9,7 +9,6 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dollarkillerx/easylog v0.0.0-20200103121335-bbde5b9f0db8
 	github.com/dollarkillerx/proto v0.0.0-20191005023209-37173c8a8b75
-	github.com/emicklei/proto v1.6.17
 	github.com/gogo/protobuf v1.3.0
 	github.com/golang/protobuf v1.3.2
 	github.com/gomodule/redigo v2.0.0+incompatible

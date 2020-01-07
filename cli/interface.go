@@ -6,8 +6,16 @@
  */
 package main
 
+import "github.com/dollarkillerx/proto"
+
 // 生成vodka系统
 type Generator interface {
 	Name() string
-	Run(opt *Option) error
+	Run(opt *Option, data *RPCData) error
+}
+
+type RPCData struct {
+	Rpc     []*proto.RPC
+	Service *proto.Service
+	Message []*proto.Message
 }

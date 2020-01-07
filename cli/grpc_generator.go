@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"time"
 )
 
 // protoc --go_out=plugins=grpc:. *.proto
@@ -22,7 +21,12 @@ func (g *grpcGenerator) Name() string {
 	return "grpcGenerator"
 }
 
-func (g *grpcGenerator) Run(opt *Option) error {
+func (g *grpcGenerator) Run(opt *Option, data *RPCData) error {
+	//err := os.MkdirAll(filepath.Join(opt.Output, "generate"), 00755)
+	//if err != nil {
+	//	return err
+	//}
+
 	dir := fmt.Sprintf("plugins=grpc:%s/generate/", opt.Output)
 	command := exec.Command("protoc", "--go_out", dir, opt.ProtoFileName)
 	command.Stdout = os.Stdout
@@ -31,7 +35,6 @@ func (g *grpcGenerator) Run(opt *Option) error {
 }
 
 func init() {
-	time.Sleep(time.Millisecond * 50) // 延迟等待 目录创建完毕
 	generator := grpcGenerator{}
 	genMgr.RegisterMgr(generator.Name(), &generator)
 }

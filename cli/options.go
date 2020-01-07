@@ -11,5 +11,6 @@ type Option struct {
 	Output        string // 输出目录
 	GenClientCode bool   // 生成client
 	GenServerCode bool   // 生成server
+	GoMod         string // go mod
 	Prefix        string
 }

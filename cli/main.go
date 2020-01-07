@@ -54,6 +54,14 @@ func main() {
 			Required:    false,
 			Destination: &opt.GenServerCode,
 		},
+		// go mod
+		cli.StringFlag{
+			Name:        "m",
+			Usage:       "go mod name",
+			Required:    false,
+			Value:       "vodka",
+			Destination: &opt.GoMod,
+		},
 	}
 
 	// 执行逻辑入口

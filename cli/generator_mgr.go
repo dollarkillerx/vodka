@@ -19,9 +19,21 @@ type generatorMgr struct {
 
 func (g *generatorMgr) Run(opt *Option) error {
 	var err error
+
+	// 前置基础设施的生成
+	err = dirGenerator(opt)
+	if err != nil {
+		return err
+	}
+	data, err := getRPCData(opt)
+	if err != nil {
+		return err
+	}
+	// 基础设施生成结束
+
 	genMgr.mgr.Range(func(key, value interface{}) bool {
 		generator := value.(Generator)
-		err := generator.Run(opt)
+		err := generator.Run(opt, data)
 		if err != nil {
 			return false
 		}
