@@ -28,7 +28,7 @@ func main() {
 		cli.StringFlag{
 			Name:        "f",
 			Usage:       "idl file path",
-			Required:    false,
+			Required:    true,
 			Value:       "vodka.proto",
 			Destination: &opt.ProtoFileName,
 		},
@@ -58,7 +58,7 @@ func main() {
 		cli.StringFlag{
 			Name:        "m",
 			Usage:       "go mod name",
-			Required:    false,
+			Required:    true,
 			Value:       "vodka",
 			Destination: &opt.GoMod,
 		},
@@ -82,3 +82,13 @@ func main() {
 		log.Fatalln(err)
 	}
 }
+
+//  controller: 存在服务的方法实现
+//  idl: 存放服务的idl定义
+//  main: 存放服务的入口代码
+//  scripts: 存放服务的脚本
+//  conf: 存放服务的配置文件
+//  app/router: 存放服务的路由
+//  app/config: 存放服务的一些配置
+//  datamodels: 存放服务的实体代码
+//  generate: grpc生成的代码

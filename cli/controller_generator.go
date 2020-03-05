@@ -1,71 +1,55 @@
 /**
- * @Author: DollarKillerX
- * @Description: controller_generator grpc 调用逻辑生成
- * @Github: https://github.com/dollarkillerx
- * @Date: Create in 下午4:45 2020/1/6
+*@program: vodka
+*@description: https://github.com/dollarkillerx
+*@author: dollarkiller [dollarkiller@dollarkiller.com]
+*@create: 2020-03-05 19:56
  */
 package main
 
 import (
+	"fmt"
 	"github.com/dollarkillerx/proto"
-	"os"
 )
 
-type controllerGenerator struct {
-	rpc     []*proto.RPC
-	service *proto.Service
-	message []*proto.Message
+type ControllerGenerator struct {
 }
 
-func (c *controllerGenerator) Name() string {
+func (c *ControllerGenerator) Name() string {
 	return "ControllerGenerator"
 }
 
-func (c *controllerGenerator) Run(opt *Option) error {
-	file, e := os.Open(opt.ProtoFileName)
-	if e != nil {
-		return e
+func (c *ControllerGenerator) Run(opt *Option, data *RPCData) error {
+	fileBody := ""
+	header := c.getHeader(opt, data)
+	fileBody += header
+
+	for _, v := range data.Rpc {
+		fileBody += c.getBody(data, v)
 	}
-	parser := proto.NewParser(file)
-	parse, e := parser.Parse()
-	if e != nil {
-		return e
-	}
-	proto.Walk(
-		parse,
-		proto.WithService(c.withService),
-		proto.WithMessage(c.withMessage),
-		proto.WithRPC(c.withRPC),
-	)
 
 	return nil
 }
 
-func (c *controllerGenerator) withRPC(rpc *proto.RPC) {
-	c.rpc = append(c.rpc, rpc)
+func (c *ControllerGenerator) getHeader(opt *Option, data *RPCData) string {
+	return fmt.Sprintf(ControllerTemplateHeader, opt.GoMod,data.Service.Name)
 }
 
-func (c *controllerGenerator) withMessage(message *proto.Message) {
-	c.message = append(c.message, message)
-}
-
-func (c *controllerGenerator) withService(service *proto.Service) {
-	c.service = service
-}
-
-// 获取rpc基本信息
-func getRPCData(opt *Option) (*RPCData, error) {
-	generator := controllerGenerator{
-		rpc:     []*proto.RPC{},
-		message: []*proto.Message{},
+func (c *ControllerGenerator) getBody(data *RPCData, rpc *proto.RPC) string {
+	fileBody := ""
+	switch {
+	// 双向流
+	case rpc.StreamsReturns && rpc.StreamsRequest:
+		fileBody = fmt.Sprintf(ControllerFunctionType3, data.Service.Name, rpc.Name, data.Pkg.Name, data.Service.Name, rpc.Name)
+	// 普通
+	case rpc.StreamsReturns == false && rpc.StreamsRequest == false:
+		fileBody = fmt.Sprintf(ControllerFunctionType1, data.Service.Name, rpc.Name, data.Pkg.Name, rpc.RequestType, data.Pkg.Name, rpc.ReturnsType)
+	// 客户端流
+	case rpc.StreamsReturns == false && rpc.StreamsRequest == true:
+		fileBody = fmt.Sprintf(ControllerFunctionType2, data.Service.Name, rpc.Name, data.Pkg.Name, rpc.RequestType, data.Pkg.Name, data.Service.Name, rpc.Name)
+	// 服务端流
+	case rpc.StreamsReturns == true && rpc.StreamsRequest == false:
+		fileBody = fmt.Sprintf(ControllerFunctionType3, data.Service.Name, rpc.Name, data.Pkg.Name, data.Service.Name, rpc.Name)
 	}
-	err := generator.Run(opt)
-	if err != nil {
-		return nil, err
-	}
-	result := RPCData{}
-	result.Message = generator.message
-	result.Service = generator.service
-	result.Rpc = generator.rpc
-	return &result, nil
+
+	return fileBody
 }

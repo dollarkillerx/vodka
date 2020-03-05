@@ -18,4 +18,5 @@ type RPCData struct {
 	Rpc     []*proto.RPC
 	Service *proto.Service
 	Message []*proto.Message
+	Pkg     *proto.Package
 }

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 // protoc --go_out=plugins=grpc:. *.proto
@@ -22,12 +23,7 @@ func (g *grpcGenerator) Name() string {
 }
 
 func (g *grpcGenerator) Run(opt *Option, data *RPCData) error {
-	//err := os.MkdirAll(filepath.Join(opt.Output, "generate"), 00755)
-	//if err != nil {
-	//	return err
-	//}
-
-	dir := fmt.Sprintf("plugins=grpc:%s/generate/", opt.Output)
+	dir := fmt.Sprintf("plugins=grpc:%s", filepath.Join(opt.Output, "generate"))
 	command := exec.Command("protoc", "--go_out", dir, opt.ProtoFileName)
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
