@@ -14,8 +14,9 @@ var MainTemplate = `
 package main
 
 import (
+	"%s/core/router"
 	"%s/generate"
-	"%s/router"
+	router2 "%s/router"
 	"log"
 	"net"
 	
@@ -24,6 +25,8 @@ import (
 
 func main() {
 	server := grpc.NewServer()
+	router := router.New()
+	router2.Registry(router)  
 	pb.RegisterServiceServer(server, &router.%sRouter{})
 	dial, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {

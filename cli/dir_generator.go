@@ -22,6 +22,7 @@ var dirList = []string{
 	"router",
 	"app/config",
 	"datamodels",
+	"core/router",
 	"generate",
 }
 
