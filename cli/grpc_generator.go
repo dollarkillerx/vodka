@@ -33,4 +33,11 @@ func (g *grpcGenerator) Run(opt *Option, data *RPCData) error {
 func init() {
 	generator := grpcGenerator{}
 	genMgr.RegisterMgr(generator.Name(), &generator)
+
+	routerGenerator := RouterGenerator{}
+	genMgr.RegisterMgr(routerGenerator.Name(), &routerGenerator)
+
+	mainGenerator := MainGenerator{}
+	genMgr.RegisterMgr(mainGenerator.Name(), &mainGenerator)
+
 }

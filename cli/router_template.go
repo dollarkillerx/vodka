@@ -6,35 +6,39 @@
  */
 package main
 
-var ControllerTemplateHeader = `
-package controller
+var RouterTemplateHeader = `
+/**
+*@Program: vodka
+*@MicroServices Framework: https://github.com/dollarkillerx
+ */
+package router
 
 import (
-	"context"
 	"%s/generate"
+	"context"
 )
 
-type %sController struct {
+type %sRouter struct {
 }
 `
 
 // 普通类型
-var ControllerFunctionType1 = `
-func (s *%sController) %s(ctx context.Context,req *%s.%s) (*%s.%s,error) {
+var RouterFunctionType1 = `
+func (s *%sRouter) %s(ctx context.Context,req *%s.%s) (*%s.%s,error) {
 	return nil,nil
 }
 `
 
 // 客户端流
-var ControllerFunctionType2 = `
-func (s *%sController) %s(req *%s.%s,ser %s.%s_%sServer) error {
+var RouterFunctionType2 = `
+func (s *%sRouter) %s(req *%s.%s,ser %s.%s_%sServer) error {
 	return nil
 }
 `
 
 // 服务端流 & 双向流
-var ControllerFunctionType3 = `
-func (s *%sController) %s(ser %s.%s_%sServer) error {
+var RouterFunctionType3 = `
+func (s *%sRouter) %s(ser %s.%s_%sServer) error {
 	return nil
 }
 `

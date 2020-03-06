@@ -87,7 +87,6 @@ func (c *grpcInit) withService(service *proto.Service) {
 	c.service = service
 }
 
-
 func TestEncoding2(t *testing.T) {
 	open, err := os.Open("test.proto")
 	if err != nil {
@@ -143,7 +142,7 @@ func (c *ControllerGenerator) Run(opt *Option, data *RPCData) error {
 	for _, v := range data.Rpc {
 		fileBody += c.getBody(data, v)
 	}
-	ioutil.WriteFile("test.go",[]byte(fileBody),000666)
+	ioutil.WriteFile("test.go", []byte(fileBody), 000666)
 	return nil
 }
 
@@ -179,6 +178,7 @@ type Option struct {
 	GoMod         string // go mod
 	Prefix        string
 }
+
 var ControllerTemplateHeader = `
 package controller
 

@@ -9,7 +9,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/dollarkillerx/vodka/cli/test/pb"
+	"github.com/dollarkillerx/vodka/cli/test/grpc_test/pb"
 	"google.golang.org/grpc"
 	"log"
 )

@@ -19,7 +19,7 @@ var dirList = []string{
 	"main",
 	"scripts",
 	"conf",
-	"app/router",
+	"router",
 	"app/config",
 	"datamodels",
 	"generate",
