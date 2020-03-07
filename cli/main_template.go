@@ -14,20 +14,24 @@ var MainTemplate = `
 package main
 
 import (
+	"log"
+	"net"
 	"%s/core/router"
 	"%s/generate"
 	router2 "%s/router"
-	"log"
-	"net"
 	
 	"google.golang.org/grpc"
 )
+
+func init() {
+	log.Println("Vodka is initialized")
+}
 
 func main() {
 	server := grpc.NewServer()
 	router := router.New()
 	router2.Registry(router)  
-	pb.RegisterServiceServer(server, &router.%sRouter{})
+	pb.RegisterServiceServer(server, router.RegistryGRPC())
 	dial, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {
 		log.Fatalln(err)

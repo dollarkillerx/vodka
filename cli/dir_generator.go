@@ -24,6 +24,7 @@ var dirList = []string{
 	"datamodels",
 	"core/router",
 	"generate",
+	"middleware",
 }
 
 func dirGenerator(opt *Option) error {

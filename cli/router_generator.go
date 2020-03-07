@@ -7,9 +7,11 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
 	"io/ioutil"
+	"log"
 	"path/filepath"
+	"text/template"
 )
 
 type RouterGenerator struct {
@@ -20,7 +22,24 @@ func (r *RouterGenerator) Name() string {
 }
 
 func (r *RouterGenerator) Run(opt *Option, data *RPCData) error {
-	fileBody := fmt.Sprintf(RouterGeneratorTemplate, opt.GoMod)
+	fileBody := r.getBody(opt, data)
 	file := filepath.Join(opt.Output, "router", "app.go")
-	return ioutil.WriteFile(file, []byte(fileBody), 00755)
+	return ioutil.WriteFile(file, fileBody, 00755)
+}
+
+func (r *RouterGenerator) getBody(opt *Option, data *RPCData) []byte {
+	bufferString := bytes.NewBufferString("")
+	parse, err := template.New("main").Parse(RouterGeneratorTemplate)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = parse.Execute(bufferString, map[string]interface{}{
+		"GoMod": opt.GoMod,
+		"RPC":   data.Rpc,
+	})
+	if err != nil {
+		log.Fatalln("Router Generator: ", err)
+	}
+	return bufferString.Bytes()
 }

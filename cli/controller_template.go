@@ -2,25 +2,23 @@
 *@program: vodka
 *@description: https://github.com/dollarkillerx
 *@author: dollarkiller [dollarkiller@dollarkiller.com]
-*@create: 2020-03-06 18:02
+*@create: 2020-03-07 10:58
  */
 package main
 
-var RouterGeneratorTemplate = ` 
+var ControllerTemplate = `
 /**
 *@Program: vodka
 *@MicroServices Framework: https://github.com/dollarkillerx
  */
-package router
+package controller
 
 import (
-	"{{.GoMod}}/controller"
-	"{{.GoMod}}/core/router"
+	"%s/core/router"
 )
 
-func Registry(app *router.Router) {
-{{range $k,$v := .RPC}}
-	app.{{$v.Name}}(controller.{{$v.Name}})
-{{end}}
+func %s(ctx *router.RouterContext) {
+	context := ctx.Ctx.(*router.%sFuncContext)
+	context = context
 }
 `

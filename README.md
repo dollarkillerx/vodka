@@ -30,10 +30,13 @@ idl: 存放服务的idl定义
 main: 存放服务的入口代码
 scripts: 存放服务的脚本
 conf: 存放服务的配置文件
-app/router: 存放服务的路由
+router: 存放服务的路由
 app/config: 存放服务的一些配置
 datamodels: 存放服务的实体代码
 generate: grpc生成的代码
+
+core 下的代码都是自动生成的   用于核心调度
+core/router 自动生成路由代码
 ```
 - 命令行参数设计
     - -f 指定idl文件

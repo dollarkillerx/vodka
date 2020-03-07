@@ -6,60 +6,6 @@
  */
 package main
 
-// 普通类型
-var CoreRouterFunctionType1 = `
-func (s *%sRouter) %s(ctx context.Context,req *%s.%s) (*%s.%s,error) {
-	return nil,nil
-}
-`
-
-// 客户端流
-var CoreRouterFunctionType2 = `
-func (s *%sRouter) %s(req *%s.%s,ser %s.%s_%sServer) error {
-	return nil
-}
-`
-
-// 服务端流 & 双向流
-var CoreRouterFunctionType3 = `
-func (s *%sRouter) %s(ser %s.%s_%sServer) error {
-	return nil
-}
-`
-
-//var ControllerTemplateHeader = `
-//package controller
-//
-//import (
-//	"context"
-//	"{{.GoMod}}/generate/{{.PkgName}}"
-//)
-//
-//type {{.ServerName}}Controller struct {
-//}
-//`
-//
-//// 普通类型
-//var ControllerFunctionType1 = `
-//func (s *{{.ServerName}}Controller) {{.Name}}(ctx context.Context,req *{{.PkgName}}.RequestType) (*{{.PkgName}}.ReturnsType,error) {
-//	return nil,nil
-//}
-//`
-//
-//// 客户端流
-//var ControllerFunctionType2 = `
-//func (s *{{.ServerName}}Controller) {{.Name}}(req *{{.PkgName}}.RequestType,ser {{.PkgName}}.{{.ServerName}}_{{.Name}}Server) error {
-//	return nil
-//}
-//`
-//
-//// 服务端流 & 双向流
-//var ControllerFunctionType3 = `
-//func (s *{{.ServerName}}Controller) {{.Name}}(ser {{.PkgName}}.{{.ServerName}}_{{.Name}}Server) error {
-//	return nil
-//}
-//`
-
 var CoreRouterTemplateHeader = ` 
 /**
 *@Program: vodka
@@ -95,8 +41,6 @@ func (r *Router) {{$v.Name}}({{$v.Name}}func ...RunFunc) {
 	r.router.{{$v.Name}}FuncSlice = append(r.router.{{$v.Name}}FuncSlice, {{$v.Name}}func...)
 }
 {{end}}
-
-
 type serviceRouter struct {
 {{range $k,$v := .RPC}}
 	{{$v.Name}}FuncSlice []RunFunc
@@ -122,33 +66,93 @@ func (r *RouterContext) Next() {
 	}
 }
 {{range $k,$v := .RPC}}
-type {{%v.Name}}FuncContext struct {
-	{{if $v.StreamsRequest and $v.StreamsReturns}}
+type {{$v.Name}}FuncContext struct {
+	{{if and (eq $v.StreamsRequest true) (eq $v.StreamsReturns true)}}
+	Ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}Server
+	{{else if and (eq $v.StreamsRequest false) (eq $v.StreamsReturns false)}}
 	Ctx  context.Context
-	Req  *pb.Req
-	Resp *pb.Resp
-	Err  error
-	{{else if eq $v.StreamsRequest true}}
-	
+	Req  *{{$.Pkg}}.{{$v.RequestType}}
+	Resp *{{$.Pkg}}.{{$v.ReturnsType}}
+	{{else if and (eq $v.StreamsRequest true) (eq $v.StreamsReturns false)}}
+	Ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}Server
+	{{else if and (eq $v.StreamsRequest false) (eq $v.StreamsReturns true)}}
+	Req  *{{$.Pkg}}.{{$v.RequestType}}
+	Ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}Server	
 	{{end}}
+	Err  error
 }
 {{end}}
-type Run2FuncContext struct {
-	Req *pb.Req
-	Ser pb.Service_Run2Server
-	Err error
-}
-type Run3FuncContext struct {
-	Ser pb.Service_Run3Server
-	Err error
-}
-type Run4FuncContext struct {
-	Ser pb.Service_Run4Server
-	Err error
-}
 
 {{range $k,$v := .RPC}}
 func (r *{{$v.Name}}FuncContext) _routerContext() {}
 {{end}}
 type RunFunc func(ctx *RouterContext)
+
+// 下面是主题方法
+{{range $k,$v := .RPC}}
+{{if and (eq $v.StreamsRequest true) (eq $v.StreamsReturns true)}}
+func (s *serviceRouter) {{$v.Name}}(ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}Server) error {
+	routerContext := RouterContext{
+		Ctx: &{{$v.Name}}FuncContext{
+			Err: nil,
+			Ser: ser,
+		},
+		funcList: s.{{$v.Name}}FuncSlice,
+		index:    0,
+	}
+
+	routerContext.Next()
+	funcContext := routerContext.Ctx.(*{{$v.Name}}FuncContext)
+	return funcContext.Err
+}
+{{else if and (eq $v.StreamsRequest false) (eq $v.StreamsReturns false)}}
+func (s *serviceRouter) {{$v.Name}}(ctx context.Context, req *{{$.Pkg}}.{{$v.RequestType}}) (*{{$.Pkg}}.{{$v.ReturnsType}}, error) {
+	routerContext := RouterContext{
+		Ctx: &{{$v.Name}}FuncContext{
+			Ctx:  ctx,
+			Req:  req,
+			Resp: nil,
+			Err:  nil,
+		},
+		funcList: s.{{$v.Name}}FuncSlice,
+		index:    0,
+	}
+
+	routerContext.Next()
+	funcContext := routerContext.Ctx.(*{{$v.Name}}FuncContext)
+	return funcContext.Resp, funcContext.Err
+}
+{{else if and (eq $v.StreamsRequest true) (eq $v.StreamsReturns false)}}
+func (s *serviceRouter) {{$v.Name}}(ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}Server) error {
+	routerContext := RouterContext{
+		Ctx: &{{$v.Name}}FuncContext{
+			Err: nil,
+			Ser: ser,
+		},
+		funcList: s.{{$v.Name}}FuncSlice,
+		index:    0,
+	}
+
+	routerContext.Next()
+	funcContext := routerContext.Ctx.(*{{$v.Name}}FuncContext)
+	return funcContext.Err
+}
+{{else if and (eq $v.StreamsRequest false) (eq $v.StreamsReturns true)}}
+func (s *serviceRouter) {{$v.Name}}(req *{{$.Pkg}}.{{$v.RequestType}}, ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}Server) error {
+	routerContext := RouterContext{
+		Ctx: &{{$v.Name}}FuncContext{
+			Req: req,
+			Ser: ser,
+			Err: nil,
+		},
+		funcList: s.{{$v.Name}}FuncSlice,
+		index:    0,
+	}
+
+	routerContext.Next()
+	funcContext := routerContext.Ctx.(*{{$v.Name}}FuncContext)
+	return funcContext.Err
+}
+{{end}}
+{{end}}
 `

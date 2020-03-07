@@ -24,7 +24,10 @@ var tmp1 = `
 `
 
 var tmp2 = `
-
+	{{range $k,$v := .Tc}}
+		{{$.Tic}}
+		$v: {{$v}}
+	{{end}}
 `
 
 var tmp3 = `
@@ -57,7 +60,6 @@ func TestTmp(t *testing.T) {
 		"Pc": false,
 	})
 
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -69,6 +71,25 @@ func TestWW(t *testing.T) {
 	a := ""
 	bufferString := bytes.NewBufferString(a)
 	_, err := bufferString.WriteString("aaa")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println(bufferString.String())
+}
+
+func TestCc(t *testing.T) {
+	dataa := []string{"a", "b", "c"}
+	title := "this is title"
+	bufferString := bytes.NewBufferString("")
+	AA, err := template.New("ac").Parse(tmp2)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	AA.Execute(bufferString, map[string]interface{}{
+		"Tc":  dataa,
+		"Tic": title,
+	})
 	if err != nil {
 		log.Fatalln(err)
 	}
