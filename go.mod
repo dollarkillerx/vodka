@@ -14,6 +14,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.9
+	github.com/prometheus/client_golang v1.5.0
 	github.com/sony/sonyflake v1.0.0
 	github.com/urfave/cli v1.22.2
 	go.etcd.io/etcd v3.3.15+incompatible
