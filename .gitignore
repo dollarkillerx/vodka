@@ -13,3 +13,5 @@
 
 .idea
 tools/vodka/vodka
+go.sum
+cli/test/cli_test/cli

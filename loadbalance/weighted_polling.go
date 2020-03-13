@@ -1,58 +1,52 @@
 /**
- * @Author: DollarKiller
- * @Description: 加权轮询
+ * @Author: DollarKillerX
+ * @Description: weighted_polling 加权轮询
  * @Github: https://github.com/dollarkillerx
- * @Date: Create in 16:07 2019-10-03
+ * @Date: Create in 下午4:01 2020/1/4
  */
 package loadbalance
 
 import (
 	"context"
-	"fmt"
-	"sync/atomic"
-
-	"github.com/dollarkillerx/vodka/registry"
+	"errors"
+	"github.com/dollarkillerx/vodka/registered"
 )
 
 type WeightedPolling struct {
-	num atomic.Value
+	id int
 }
 
 func NewWeightedPolling() *WeightedPolling {
-	item := &WeightedPolling{}
-	item.num.Store(0)
-	return item
+	return &WeightedPolling{
+		id: 0,
+	}
 }
 
 func (w *WeightedPolling) Name() string {
 	return "WeightedPolling"
 }
 
-func (w *WeightedPolling) Select(ctx context.Context, nodes *registry.Service) (node *registry.Node, err error) {
-	if len(nodes.Nodes) <= 0 {
-		return nil, fmt.Errorf("not data")
+func (w *WeightedPolling) Select(ctx context.Context, server *registered.Service) (*registered.Node, error) {
+	if len(server.Node) == 0 {
+		return nil, errors.New("not work")
 	}
-	var nodec []*registry.Node
-	for _, c := range nodes.Nodes {
-		if c.Weight == 0 {
-			c.Weight = 1
-		}
-		for i := 0; i < c.Weight; i++ {
-			nodec = append(nodec, c)
-		}
+	structure := w.structure(server)
+	if w.id > len(structure)-1 {
+		w.id = 0
 	}
+	defer func() {
+		w.id++
+	}()
+	return structure[w.id], nil
+}
 
-	i := w.num.Load().(int)
-	if i >= len(nodec) {
-		i = 0
-		node = nodec[i]
-		i += 1
-		w.num.Store(i)
-		return node, nil
-	} else {
-		node = nodec[i]
-		i += 1
-		w.num.Store(i)
-		return node, nil
+func (w *WeightedPolling) structure(server *registered.Service) []*registered.Node {
+	result := []*registered.Node{}
+
+	for _, v := range server.Node {
+		for i := 0; i < v.Weight; i++ {
+			result = append(result, v)
+		}
 	}
+	return result
 }

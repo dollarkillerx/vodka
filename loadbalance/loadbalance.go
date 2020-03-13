@@ -1,18 +1,17 @@
 /**
- * @Author: DollarKiller
- * @Description: 负载均衡器
+ * @Author: DollarKillerX
+ * @Description: loadbalance 负载均衡器
  * @Github: https://github.com/dollarkillerx
- * @Date: Create in 16:03 2019-10-03
+ * @Date: Create in 下午3:23 2020/1/4
  */
 package loadbalance
 
 import (
 	"context"
-
-	"github.com/dollarkillerx/vodka/registry"
+	"github.com/dollarkillerx/vodka/registered"
 )
 
 type LoadBalance interface {
-	Name() string                                                                         // 算法名称
-	Select(ctx context.Context, nodes *registry.Service) (node *registry.Node, err error) // 返回选中
+	Name() string                                                                      // 返回负载器名词
+	Select(ctx context.Context, service *registered.Service) (*registered.Node, error) // 传入获取到的服务列表 返回负载后的节点
 }

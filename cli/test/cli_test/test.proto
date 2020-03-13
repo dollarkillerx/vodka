@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package pb;
+
+message RespOk {
+    int32 success_id = 1;
+}
+
+message RespError {
+    int32 error_id = 1;
+}
+
+message Req {
+    string msg = 1;
+}
+
+message Resp {
+    string msg = 1;
+    oneof Resp {
+        RespOk RespOk = 2;
+        RespError RespError = 3;
+    }
+}
+
+service Service {
+    rpc Run1(Req) returns (Resp);
+    rpc Run2(Req) returns (stream Resp);
+    rpc Run3(stream Req) returns (Resp);
+    rpc Run4(stream Req) returns (stream Resp);
+}

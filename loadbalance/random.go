@@ -1,29 +1,34 @@
 /**
- * @Author: DollarKiller
- * @Description: random随机
+ * @Author: DollarKillerX
+ * @Description: random 随机负载器
  * @Github: https://github.com/dollarkillerx
- * @Date: Create in 16:53 2019-10-03
+ * @Date: Create in 下午3:26 2020/1/4
  */
 package loadbalance
 
 import (
 	"context"
+	"errors"
+	"github.com/dollarkillerx/vodka/registered"
 	"math/rand"
 	"time"
-
-	"github.com/dollarkillerx/vodka/registry"
 )
 
-type Random struct {
+type RandomLoadBalance struct {
 }
 
-func (r *Random) Name() string {
-	return "random"
+func NewRandomLoadBalance() *RandomLoadBalance {
+	return &RandomLoadBalance{}
 }
 
-func (r *Random) Select(ctx context.Context, nodes *registry.Service) (node *registry.Node, err error) {
+func (r *RandomLoadBalance) Name() string {
+	return "RandomLoadBalance"
+}
+
+func (r *RandomLoadBalance) Select(ctx context.Context, server *registered.Service) (*registered.Node, error) {
+	if len(server.Node) == 0 {
+		return nil, errors.New("not work")
+	}
 	rand.Seed(time.Now().UnixNano())
-	num := rand.Intn(len(nodes.Nodes))
-
-	return nodes.Nodes[num], nil
+	return server.Node[rand.Intn(len(server.Node))], nil
 }
