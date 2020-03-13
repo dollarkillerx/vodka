@@ -32,7 +32,7 @@ func main() {
 func Run1Client(ser pb.ServiceClient) {
 	resp, err := ser.Run1(context.TODO(), &pb.Req{Msg: "Hello"})
 	if err != nil {
-		log.Fatalln("e1: ",err)
+		log.Fatalln("e1: ", err)
 	}
 	fmt.Println(resp.Msg)
 	fmt.Println(resp)

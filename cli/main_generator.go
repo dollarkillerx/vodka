@@ -29,7 +29,7 @@ func (m *MainGenerator) Run(opt *Option, data *RPCData) error {
 	}
 	err = parse.Execute(bs, map[string]interface{}{
 		"Package": opt.GoMod,
-		"Pkg":data.Pkg.Name,
+		"Pkg":     data.Pkg.Name,
 	})
 	if err != nil {
 		log.Fatalln(err)
