@@ -30,7 +30,7 @@ func main() {
 	app := router.New()
 	app.Use(middleware2.BasePrometheus)  // 注册全局中间件  基础Prometheus
 	router2.Registry(app)
-	{{.Pkg}}.RegisterServiceServer(v.RegisterServer(), app.RegistryGRPC())
+	{{.Pkg}}.Register{{.Server}}Server(v.RegisterServer(), app.RegistryGRPC())
 
 	go middleware.Prometheus.Run(":8085")
 	log.Println(v.Run(router.ServerAddr))
