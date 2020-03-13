@@ -30,6 +30,7 @@ func (m *MainGenerator) Run(opt *Option, data *RPCData) error {
 	err = parse.Execute(bs, map[string]interface{}{
 		"Package": opt.GoMod,
 		"Pkg":     data.Pkg.Name,
+		"Server":data.Service.Name,
 	})
 	if err != nil {
 		log.Fatalln(err)
