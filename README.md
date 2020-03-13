@@ -1,5 +1,18 @@
 # Vodka MicroServices Framework 
-重构vodka
+
+![](./README/vodka.png)
+### 轻量级可扩展微服务框架
+- [x] 服务注册             
+- [x] 服务发现             
+- [x] 负载均衡             
+- [x] 健康检测             
+- [x] GRPC整合            
+- [x] 自动化代码生成   (重新设计)       
+- [x] middleware设计       
+- [x] Prometheus监控设计             
+- [ ] 配置文件集成          
+- [ ] 限流middleware       
+- [ ] 分布式追踪middleware  
 
 ### 依赖
 - Sonyflake  (分布式ID)
@@ -8,6 +21,8 @@
 - json-iterator (json序列化)
 - grpc (通讯)
 - easylog (日志库)
+
+
 
 
 ### 注册中心
