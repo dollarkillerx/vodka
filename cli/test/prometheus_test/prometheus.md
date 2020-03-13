@@ -31,3 +31,5 @@ DataModelFiltering
     - 当前请求的trace_id
     - 当前服务器ip
     - 客户端请求ip
+
+// rate（hd_errors_total{service="hh"}[10m]) 统计10m增加数量

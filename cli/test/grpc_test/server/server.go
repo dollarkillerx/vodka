@@ -28,7 +28,9 @@ func main() {
 }
 
 func (s *Server) Run1(ctx context.Context, req *pb.Req) (*pb.Resp, error) {
-	return &pb.Resp{}, nil
+	return &pb.Resp{
+		Msg:req.Msg + " 以阅",
+	}, nil
 }
 
 func (s *Server) Run2(req *pb.Req, ser pb.Service_Run2Server) error {

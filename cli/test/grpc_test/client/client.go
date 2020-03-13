@@ -12,25 +12,29 @@ import (
 	"github.com/dollarkillerx/vodka/cli/test/grpc_test/pb"
 	"google.golang.org/grpc"
 	"log"
+	"time"
 )
 
 func main() {
-	dial, err := grpc.Dial("0.0.0.0:8082", grpc.WithInsecure())
+	dial, err := grpc.Dial("0.0.0.0:8080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer dial.Close()
 	client := pb.NewServiceClient(dial)
+	fmt.Println("进来了")
 	go Run1Client(client)
 	go Run2Client(client)
 	Run3Client(client)
+	time.Sleep(time.Second * 10)
 }
 
 func Run1Client(ser pb.ServiceClient) {
 	resp, err := ser.Run1(context.TODO(), &pb.Req{Msg: "Hello"})
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("e1: ",err)
 	}
+	fmt.Println(resp.Msg)
 	fmt.Println(resp)
 }
 

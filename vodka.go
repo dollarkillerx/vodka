@@ -12,10 +12,6 @@ import (
 	"net"
 )
 
-func init() {
-	log.Println("Vodka is initialized")
-}
-
 type vodka struct {
 	gRPC *grpc.Server
 }
@@ -34,5 +30,6 @@ func (v *vodka) Run(addr string) error {
 	if err != nil {
 		return err
 	}
+	log.Println("Vodka is initialized Listen Success Run: ", addr)
 	return v.gRPC.Serve(listen)
 }

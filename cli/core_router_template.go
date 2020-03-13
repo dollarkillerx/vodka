@@ -14,10 +14,13 @@ var CoreRouterTemplateHeader = `
 package router
 
 import (
-	pb "{{.GoMod}}/generate"
 	"context"
+	"fmt"
 	"log"
+	{{.Pkg}} "{{.GoMod}}/generate"
 )
+
+var ServerAddr string
 
 type Router struct {
 	router *serviceRouter
@@ -36,6 +39,13 @@ func New() *Router {
 func (r *Router) RegistryGRPC() *serviceRouter {
 	return r.router
 }
+
+func (r *Router) Use(middleware ...RunFunc) {
+{{range $k,$v := .RPC}}
+	r.router.{{$v.Name}}FuncSlice = append(r.router.{{$v.Name}}FuncSlice, middleware...)
+{{end}}
+}
+
 {{range $k,$v := .RPC}}
 func (r *Router) {{$v.Name}}({{$v.Name}}func ...RunFunc) {
 	r.router.{{$v.Name}}FuncSlice = append(r.router.{{$v.Name}}FuncSlice, {{$v.Name}}func...)
@@ -55,6 +65,31 @@ type RouterContext struct {
 	Ctx      RouterContextItem
 	funcList []RunFunc
 	index    int
+	Context  context.Context
+	psg      *PrometheusMsg
+	err      error
+}
+
+type PrometheusMsg struct {
+	FuncName    string // 方法名称
+	ServerName  string // 服务名称
+	Environment string // 环境 开发 or 测试
+	Cluster     string // 集群名称
+	EngineRoom  string // 机房
+	TraceId     string // 分布式追踪id
+	RespIP      string // 服务端IP
+	ReqIP       string // 客户端IP
+}
+
+func (r *RouterContext) GetPrometheusMsg() *PrometheusMsg {
+	return r.psg
+}
+
+func (r *RouterContext) ErrSet(err error) {
+	r.err = err
+}
+func (r *RouterContext) ErrGet() error {
+	return r.err
 }
 
 func (r *RouterContext) Next() {
@@ -99,6 +134,11 @@ func (s *serviceRouter) {{$v.Name}}(ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}S
 		},
 		funcList: s.{{$v.Name}}FuncSlice,
 		index:    0,
+		Context:context.Background(),
+		psg: &PrometheusMsg{
+			FuncName: "{{$v.Name}}",
+			ServerName:fmt.Sprintf("%s:%s","{{$.ServiceName}}",ServerAddr),
+		},
 	}
 
 	routerContext.Next()
@@ -111,11 +151,16 @@ func (s *serviceRouter) {{$v.Name}}(ctx context.Context, req *{{$.Pkg}}.{{$v.Req
 		Ctx: &{{$v.Name}}FuncContext{
 			Ctx:  ctx,
 			Req:  req,
-			Resp: nil,
+			Resp: &{{$.Pkg}}.{{$v.ReturnsType}}{},
 			Err:  nil,
 		},
 		funcList: s.{{$v.Name}}FuncSlice,
 		index:    0,
+		Context:context.Background(),
+		psg: &PrometheusMsg{
+			FuncName: "{{$v.Name}}",
+			ServerName:fmt.Sprintf("%s:%s","{{$.ServiceName}}",ServerAddr),
+		},
 	}
 
 	routerContext.Next()
@@ -131,6 +176,11 @@ func (s *serviceRouter) {{$v.Name}}(ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}S
 		},
 		funcList: s.{{$v.Name}}FuncSlice,
 		index:    0,
+		Context:context.Background(),
+		psg: &PrometheusMsg{
+			FuncName: "{{$v.Name}}",
+			ServerName:fmt.Sprintf("%s:%s","{{$.ServiceName}}",ServerAddr),
+		},
 	}
 
 	routerContext.Next()
@@ -147,6 +197,11 @@ func (s *serviceRouter) {{$v.Name}}(req *{{$.Pkg}}.{{$v.RequestType}}, ser {{$.P
 		},
 		funcList: s.{{$v.Name}}FuncSlice,
 		index:    0,
+		Context:context.Background(),
+		psg: &PrometheusMsg{
+			FuncName: "{{$v.Name}}",
+			ServerName:fmt.Sprintf("%s:%s","{{$.ServiceName}}",ServerAddr),
+		},
 	}
 
 	routerContext.Next()

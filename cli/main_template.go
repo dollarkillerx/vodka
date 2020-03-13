@@ -15,28 +15,25 @@ package main
 
 import (
 	"log"
-	"net"
-	"%s/core/router"
-	"%s/generate"
-	router2 "%s/router"
+	"{{.Package}}/core/router"
+	"{{.Package}}/generate"
+	middleware2 "{{.Package}}/middleware"
+	router2 "{{.Package}}/router"
 	
-	"google.golang.org/grpc"
+	"github.com/dollarkillerx/vodka"
+	"github.com/dollarkillerx/vodka/middleware"
 )
 
-func init() {
-	log.Println("Vodka is initialized")
-}
-
 func main() {
-	server := grpc.NewServer()
-	router := router.New()
-	router2.Registry(router)  
-	pb.RegisterServiceServer(server, router.RegistryGRPC())
-	dial, err := net.Listen("tcp", "0.0.0.0:8080")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	server.Serve(dial)
+	v := vodka.New()
+	router.ServerAddr = ":8080"
+	app := router.New()
+	app.Use(middleware2.BasePrometheus)  // 注册全局中间件  基础Prometheus
+	router2.Registry(app)
+	{{.Pkg}}.RegisterServiceServer(v.RegisterServer(), app.RegistryGRPC())
+
+	go middleware.Prometheus.Run(":8085")
+	log.Println(v.Run(router.ServerAddr))
 }
 `
 

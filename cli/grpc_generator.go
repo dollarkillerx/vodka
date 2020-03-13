@@ -36,10 +36,12 @@ func init() {
 	mainGenerator := MainGenerator{}
 	coreRouterGenerator := CoreRouterGenerator{}
 	controllerGenerator := ControllerGenerator{}
+	prometheusGenerator := PrometheusGenerator{}
 
 	genMgr.RegisterMgr(generator.Name(), &generator)
 	genMgr.RegisterMgr(routerGenerator.Name(), &routerGenerator)
 	genMgr.RegisterMgr(mainGenerator.Name(), &mainGenerator)
 	genMgr.RegisterMgr(coreRouterGenerator.Name(), &coreRouterGenerator)
 	genMgr.RegisterMgr(controllerGenerator.Name(), &controllerGenerator)
+	genMgr.RegisterMgr(prometheusGenerator.Name(), &prometheusGenerator)
 }

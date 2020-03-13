@@ -1,8 +1,8 @@
 /**
 *@program: vodka
-*@description: grpc main生成器
+*@description: prometheus generator
 *@author: dollarkiller [dollarkiller@dollarkiller.com]
-*@create: 2020-03-06 09:23
+*@create: 2020-03-13 15:33
  */
 package main
 
@@ -14,27 +14,26 @@ import (
 	"text/template"
 )
 
-type MainGenerator struct {
+type PrometheusGenerator struct {
 }
 
-func (m *MainGenerator) Name() string {
-	return "MainGenerator"
+func (p *PrometheusGenerator) Name() string {
+	return "PrometheusGenerator"
 }
 
-func (m *MainGenerator) Run(opt *Option, data *RPCData) error {
+func (p *PrometheusGenerator) Run(opt *Option, data *RPCData) error {
 	bs := bytes.NewBufferString("")
-	parse, err := template.New("main").Parse(MainTemplate)
+	parse, err := template.New("main").Parse(PrometheusTemplate)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	err = parse.Execute(bs, map[string]interface{}{
 		"Package": opt.GoMod,
-		"Pkg":data.Pkg.Name,
 	})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	file := filepath.Join(opt.Output, "main", "main.go")
+	file := filepath.Join(opt.Output, "middleware", "prometheus.go")
 	return ioutil.WriteFile(file, bs.Bytes(), 00755)
 }
