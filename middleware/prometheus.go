@@ -20,7 +20,6 @@ var Prometheus *prometheus
 func init() {
 	Prometheus = &prometheus{}
 	Prometheus.init()
-	log.Println("Prometheus Middleware Success")
 }
 
 type prometheus struct {
@@ -62,23 +61,19 @@ func (p *prometheus) init() {
 
 func (p *prometheus) Run(addr string) error {
 	http.Handle("/metrics", promhttp.Handler())
+	log.Println("Prometheus Middleware Success Run: ",addr)
 	return http.ListenAndServe(addr, nil)
 }
 
 func (p *prometheus) IncrRequest(ctx context.Context, serviceName, methodName string) {
-	log.Println("aaa  111")
 	p.requestCounter.WithLabelValues(serviceName, methodName).Inc()
 }
 
 func (p *prometheus) IncrCode(ctx context.Context, serviceName, methodName string, err error) {
-	log.Println("aaa  122")
-
 	st, _ := status.FromError(err)
 	p.codeCounter.WithLabelValues(serviceName, methodName, st.Code().String()).Inc()
 }
 
 func (p *prometheus) Latency(ctx context.Context, serviceName, methodName string, us int64) {
-	log.Println("aaa  1133")
-
 	p.latencySummary.WithLabelValues(serviceName, methodName).Observe(float64(us))
 }

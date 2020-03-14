@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"log"
 	{{.Pkg}} "{{.GoMod}}/generate"
+
+	"github.com/dollarkillerx/vodka/server"
 )
 
 var ServerAddr string
@@ -159,7 +161,7 @@ func (s *serviceRouter) {{$v.Name}}(ctx context.Context, req *{{$.Pkg}}.{{$v.Req
 		Context:context.Background(),
 		psg: &PrometheusMsg{
 			FuncName: "{{$v.Name}}",
-			ServerName:fmt.Sprintf("%s:%s","{{$.ServiceName}}",ServerAddr),
+			ServerName:fmt.Sprintf("%s:%s:%s",server.Config.ServiceName,"{{$.ServiceName}}",ServerAddr),
 		},
 	}
 
@@ -179,7 +181,7 @@ func (s *serviceRouter) {{$v.Name}}(ser {{$.Pkg}}.{{$.ServiceName}}_{{$v.Name}}S
 		Context:context.Background(),
 		psg: &PrometheusMsg{
 			FuncName: "{{$v.Name}}",
-			ServerName:fmt.Sprintf("%s:%s","{{$.ServiceName}}",ServerAddr),
+			ServerName:fmt.Sprintf("%s:%s:%s",server.Config.ServiceName,"{{$.ServiceName}}",ServerAddr),
 		},
 	}
 
@@ -200,7 +202,7 @@ func (s *serviceRouter) {{$v.Name}}(req *{{$.Pkg}}.{{$v.RequestType}}, ser {{$.P
 		Context:context.Background(),
 		psg: &PrometheusMsg{
 			FuncName: "{{$v.Name}}",
-			ServerName:fmt.Sprintf("%s:%s","{{$.ServiceName}}",ServerAddr),
+			ServerName:fmt.Sprintf("%s:%s:%s",server.Config.ServiceName,"{{$.ServiceName}}",ServerAddr),
 		},
 	}
 
