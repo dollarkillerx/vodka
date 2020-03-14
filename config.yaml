@@ -1,0 +1,10 @@
+ServiceName: "VodkaExample"
+Addr: "0.0.0.0:8081"
+Log:
+  Level: "debug"
+  Dir: "log"
+  ConsoleLog: true
+Prometheus:
+  SwitchOn: true
+  Addr: "0.0.0.0:8082"
+

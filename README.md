@@ -10,7 +10,7 @@
 - [x] 自动化代码生成   (重新设计)       
 - [x] middleware设计       
 - [x] Prometheus监控设计             
-- [ ] 配置文件集成          
+- [x] 配置文件集成          
 - [ ] 限流middleware       
 - [ ] 分布式追踪middleware  
 
